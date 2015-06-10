@@ -12,10 +12,10 @@
 #include "tgchart.h"
 
 
-#define DATA_DIR            "C:\\Users\\vxc\\Workspace Qt\\s4wdchart\\s4wddata\\"
-#define DATA_FILE           "C:\\Users\\vxc\\Workspace Qt\\s4wdchart\\s4wddata\\%1nrd"
+#define DATA_DIR            "C:\\Users\\vxc\\Workspace S4wd\\chart\\s4wddata\\"
+#define DATA_FILE           "C:\\Users\\vxc\\Workspace S4wd\\chart\\s4wddata\\%1nrd"
 
-#define CSV_FILE            "C:\\Users\\vxc\\Workspace Qt\\s4wdchart\\s4wddata\\%1s4wd"
+#define CSV_FILE            "C:\\Users\\vxc\\Workspace S4wd\\chart\\s4wddata\\%1s4wd"
 
 struct Dplot
 {

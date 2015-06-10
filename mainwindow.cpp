@@ -307,7 +307,9 @@ void MainWindow::DownloadDataHandler()
     progressdialog.setRange(0,10);
     connect(&progressdialog, SIGNAL(canceled()), this, SLOT(progressdialogCancelled()));
 
-    ftp.connectToHost("192.168.40.1");
+    //ftp.connectToHost("192.168.40.1");
+    ftp.connectToHost("192.168.1.200");
+
 }
 
 void MainWindow::ftpStateChanged(int state)
@@ -315,7 +317,7 @@ void MainWindow::ftpStateChanged(int state)
     if (state == QFtp::Connected)
     {
         qDebug() << "Ftp connected.";
-        ftp.login(QString("tgard"), QString("vaughn"));
+        ftp.login(QString("s4wd"), QString("simpsondesert"));
     }
 
     else if (state == QFtp::LoggedIn)
