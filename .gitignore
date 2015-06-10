@@ -1,0 +1,4 @@
+moc_*
+*.o
+s4wddata/
+*.user
