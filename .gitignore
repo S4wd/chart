@@ -4,5 +4,5 @@ s4wddata/
 *.user*
 debug/
 release/
-Makefile.Debug
-Makefile.Release
+Makefile
+Makefile.*

@@ -7,15 +7,26 @@
 #include <QProgressDialog>
 #include <QProgressBar>
 #include <QtNetwork/QFtp>
+#include <QModelIndex>
+#include <QMenu>
 
 #include "qcustomplot.h"
 #include "tgchart.h"
 
 
-#define DATA_DIR            "C:\\Users\\vxc\\Workspace S4wd\\chart\\s4wddata\\"
-#define DATA_FILE           "C:\\Users\\vxc\\Workspace S4wd\\chart\\s4wddata\\%1nrd"
+#define A20_S4WD_HOST_IP    "192.168.40.1"
+#define A20_S4WD_FTP_LOGIN  "root"
+#define A20_S4WD_FTP_PASS   "olimex"
 
-#define CSV_FILE            "C:\\Users\\vxc\\Workspace S4wd\\chart\\s4wddata\\%1s4wd"
+#define A20_S4WD_LOGGING_DIR "/home/s4wd/logging"
+#define A20_S4WD_LOGGING_FILE "/home/s4wd/logging/%1"
+
+#define LOCAL_LOGGING_FILE    "C:\\Users\\Vaughn\\Workspace S4wd\\chart\\s4wddata\\%1"
+#define LOCAL_LOGGING_DIR     "C:\\Users\\Vaughn\\Workspace S4wd\\chart\\s4wddata"
+
+
+
+enum DataProfileType {dpCharge, dpDischarge};
 
 struct Dplot
 {
@@ -43,7 +54,7 @@ private slots:
   void selectionChanged();
   void mousePress();
   void mouseWheel();
-  void addRandomGraph();
+  //void addRandomGraph();
   void removeSelectedGraph();
   void removeAllGraphs();
   void resetZoom();
@@ -53,30 +64,51 @@ private slots:
 
   void DownloadDataHandler();
 
+  void loadSessionChooserPage();
+
   void ftpStateChanged(int state);
   void ftpFileGetProgress(qint64 done, qint64 total);
   void ftpFinished(int id, bool error);
-  void progressdialogCancelled();
+  void ftpUrlFound(QUrlInfo url);
+
+  void on_listWidget_doubleClicked(const QModelIndex &index);
+
+
 
 private:
   Ui::MainWindow *ui;
 
 
-  /*Dplot latitude;
-  Dplot longitude;
-  Dplot bearing;
-  Dplot altitiude;
+  Dplot motorT;
+  Dplot controllerT;
   Dplot volts;
-  Dplot amps;*/
-  Dplot temperature;
+  Dplot amps;
+  Dplot speed;
+  Dplot altitude;
+  //Dplot temperature;
   QVector<QString> datetime;
+
+  QStringList localFiles;
+  QStringList newFiles;
+  int filesUploaded;
 
   QFtp ftp;
   QProgressDialog progressdialog;
   QFile * localfile;
 
+  void ftpListFiles();
+  void localListFiles();
+
+  void ftpGetFile();
   qint16 countDataFiles();
-  void loadData();
+  void loadData(QString filepath, DataProfileType profile);
+  void addPlot(Dplot &plot);
+
+
+  void ftpSetup();
+  void chartSetup();
+  void loadChooser();
+
 
 };
 
