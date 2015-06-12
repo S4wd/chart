@@ -10,9 +10,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
   localListFiles();
-  loadChooser();
-  //ftpSetup();
-  ui->stackedWidget->setCurrentIndex(1);
+  chartSetup();
+  ftpSetup();
+  ui->stackedWidget->setCurrentIndex(0);
 }
 
 MainWindow::~MainWindow()
@@ -158,7 +158,7 @@ void MainWindow::removeAllGraphs()
 
 void MainWindow::resetZoom()
 {
-   ui->customPlot->xAxis->setRange(0, datetime.count());
+   ui->customPlot->xAxis->setRange(0, motorT.datapoints.count());
    ui->customPlot->replot();
 }
 
@@ -223,21 +223,18 @@ void MainWindow::graphClicked(QCPAbstractPlottable *plottable)
 
 
 
-void MainWindow::DownloadDataHandler()
-{
-    progressdialog.setLabelText("Close");
-    progressdialog.setWindowModality(Qt::WindowModal);
-    progressdialog.setRange(0,10);
-    connect(&progressdialog, SIGNAL(canceled()), this, SLOT(progressdialogCancelled()));
 
-    //ftp.connectToHost("192.168.40.1");
-    ftp.connectToHost("192.168.1.200");
-
-}
 
 void MainWindow::loadSessionChooserPage()
 {
-    ui->stackedWidget->setCurrentIndex(0);
+    localListFiles();
+    ui->listWidget->clear();
+    for (int i=0; i<localFiles.count();i++)
+    {
+        if (localFiles[i] != QString(".") && localFiles[i] != QString(".."))
+            ui->listWidget->addItem(localFiles[i]);
+    }
+    ui->stackedWidget->setCurrentIndex(1);
 }
 
 void MainWindow::ftpStateChanged(int state)
@@ -267,18 +264,29 @@ void MainWindow::ftpFinished(int id, bool error)
 {
     qDebug() << QString("Ftp finished. Id: %1").arg(id);
 
-    if (id - 4 == filesUploaded)
+    if (id == 4)
+    {
+        if (newFiles.empty())
+        {
+            ui->progressBar->setValue(100);
+            loadSessionChooserPage();
+        }
+        else
+            ftpGetFile();
+    }
+
+    else if (id - 4 == filesUploaded)
     {
         localfile->close();
         delete localfile;
 
-        filesUploaded++;
+
         if (filesUploaded == newFiles.count())
         {
             ftp.close();
             ui->progressBar->setValue(100);
             // go to session chooser page
-            ui->stackedWidget->setCurrentIndex(2);
+            loadSessionChooserPage();
         }
         else
         {
@@ -290,8 +298,7 @@ void MainWindow::ftpFinished(int id, bool error)
 
 
     }
-    else if (id == 4)
-        ftpGetFile();
+
 
 }
 
@@ -324,9 +331,9 @@ void MainWindow::ftpSetup()
 
 void MainWindow::on_listWidget_doubleClicked(const QModelIndex &index)
 {
+    removeAllGraphs();
     QString filetoload = QString(LOCAL_LOGGING_FILE).arg(ui->listWidget->item(index.row())->text());
     loadData(filetoload,dpDischarge);
-    chartSetup();
     ui->stackedWidget->setCurrentIndex(2);
 }
 
@@ -351,9 +358,12 @@ void MainWindow::localListFiles()
 
 void MainWindow::ftpGetFile()
 {
-    localfile = new QFile(QString(LOCAL_LOGGING_FILE).arg(newFiles[filesUploaded]));
+    QString filename = QString(LOCAL_LOGGING_FILE).arg(newFiles[filesUploaded]);
+    qDebug() << filename;
+    localfile = new QFile(filename);
     localfile->open(QIODevice::WriteOnly);
     ftp.get(QString(A20_S4WD_LOGGING_FILE).arg(newFiles[filesUploaded]),localfile);
+    filesUploaded++;
 }
 
 
@@ -391,16 +401,16 @@ void MainWindow::loadData(QString filepath, DataProfileType profile)
         controllerT.alias = QString("Controller Temperature");
         controllerT.datapoints.clear();
 
-        volts.alias = QString("Volts Temperature");
+        volts.alias = QString("Volts");
         volts.datapoints.clear();
 
-        amps.alias = QString("Amps Temperature");
+        amps.alias = QString("Amps");
         amps.datapoints.clear();
 
-        speed.alias = QString("Speed Temperature");
+        speed.alias = QString("Speed");
         speed.datapoints.clear();
 
-        altitude.alias = QString("Altitude Temperature");
+        altitude.alias = QString("Altitude");
         altitude.datapoints.clear();
 
         datetime.clear();
@@ -448,6 +458,7 @@ void MainWindow::loadData(QString filepath, DataProfileType profile)
         addPlot(amps);
         addPlot(altitude);
         addPlot(speed);
+        ui->customPlot->xAxis->setRange(0, motorT.datapoints.count());
     }
 
 
@@ -541,7 +552,7 @@ void MainWindow::chartSetup()
 
 
 
-    ui->customPlot->xAxis->setRange(0, motorT.datapoints.count());
+
     ui->customPlot->yAxis->setRange(0, 300);
     ui->customPlot->axisRect()->setupFullAxesBox();
 
@@ -569,12 +580,6 @@ void MainWindow::chartSetup()
     connect(ui->customPlot, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenuRequest(QPoint)));
 }
 
-void MainWindow::loadChooser()
-{
-    for (int i=0; i<localFiles.count();i++)
-        ui->listWidget->addItem(localFiles[i]);
-
-}
 
 
 

@@ -13,6 +13,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
+#include <QtGui/QHBoxLayout>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
 #include <QtGui/QListWidget>
@@ -37,6 +38,7 @@ public:
     QWidget *sessionChooserPage;
     QListWidget *listWidget;
     QWidget *plotPage;
+    QHBoxLayout *horizontalLayout;
     TgChart *customPlot;
 
     void setupUi(QMainWindow *MainWindow)
@@ -82,14 +84,20 @@ public:
         stackedWidget->addWidget(sessionChooserPage);
         plotPage = new QWidget();
         plotPage->setObjectName(QString::fromUtf8("plotPage"));
+        horizontalLayout = new QHBoxLayout(plotPage);
+        horizontalLayout->setSpacing(6);
+        horizontalLayout->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         customPlot = new TgChart(plotPage);
         customPlot->setObjectName(QString::fromUtf8("customPlot"));
-        customPlot->setGeometry(QRect(-20, 50, 931, 581));
         QSizePolicy sizePolicy1(QSizePolicy::Ignored, QSizePolicy::Ignored);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(customPlot->sizePolicy().hasHeightForWidth());
         customPlot->setSizePolicy(sizePolicy1);
+
+        horizontalLayout->addWidget(customPlot);
+
         stackedWidget->addWidget(plotPage);
 
         verticalLayout->addWidget(stackedWidget);

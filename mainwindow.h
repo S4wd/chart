@@ -21,8 +21,8 @@
 #define A20_S4WD_LOGGING_DIR "/home/s4wd/logging"
 #define A20_S4WD_LOGGING_FILE "/home/s4wd/logging/%1"
 
-#define LOCAL_LOGGING_FILE    "C:\\Users\\Vaughn\\Workspace S4wd\\chart\\s4wddata\\%1"
-#define LOCAL_LOGGING_DIR     "C:\\Users\\Vaughn\\Workspace S4wd\\chart\\s4wddata"
+#define LOCAL_LOGGING_FILE    "s4wddata\\%1"
+#define LOCAL_LOGGING_DIR     "s4wddata"
 
 
 
@@ -62,9 +62,9 @@ private slots:
   void moveLegend();
   void graphClicked(QCPAbstractPlottable *plottable);
 
-  void DownloadDataHandler();
 
-  void loadSessionChooserPage();
+
+
 
   void ftpStateChanged(int state);
   void ftpFileGetProgress(qint64 done, qint64 total);
@@ -73,7 +73,7 @@ private slots:
 
   void on_listWidget_doubleClicked(const QModelIndex &index);
 
-
+  void loadSessionChooserPage();
 
 private:
   Ui::MainWindow *ui;
@@ -107,7 +107,7 @@ private:
 
   void ftpSetup();
   void chartSetup();
-  void loadChooser();
+
 
 
 };
