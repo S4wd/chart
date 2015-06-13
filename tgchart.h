@@ -18,23 +18,21 @@ public:
     TgChart(QWidget * parent = 0);
     virtual ~TgChart();
 
-    void setZoomMode(bool mode);
-
     void setTracerGraph( QCPGraph * graph);
     void setTracerVisible(bool visible);
 
 private slots:
-    void mousePressEvent(QMouseEvent * event) override;
-    void mouseMoveEvent(QMouseEvent * event) override;
-    void mouseReleaseEvent(QMouseEvent * event) override;
+    void mousePressEvent(QMouseEvent * event);
+    void mouseMoveEvent(QMouseEvent * event);
+    void mouseReleaseEvent(QMouseEvent * event);
 
     void dataPointHint(QMouseEvent *event);
 
 private:
     bool mZoomMode;
     QRubberBand * mRubberBand;
-    QCPItemTracer * tracer;
     QPoint mOrigin;
+    QCPGraph * tracerGraph;
 };
 
 #endif // TGCHART_H

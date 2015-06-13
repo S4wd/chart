@@ -21,11 +21,11 @@
 #define A20_S4WD_LOGGING_DIR "/home/s4wd/logging"
 #define A20_S4WD_LOGGING_FILE "/home/s4wd/logging/%1"
 
-#define LOCAL_LOGGING_FILE    "s4wddata\\%1"
-#define LOCAL_LOGGING_DIR     "s4wddata"
+#define LOCAL_LOGGING_FILE    "C:\\Users\\Vaughn\\Workspace S4wd\\chart\\debug\\s4wddata\\%1"
+#define LOCAL_LOGGING_DIR     "C:\\Users\\Vaughn\\Workspace S4wd\\chart\\debug\\s4wddata"
 
 
-
+enum DriveAxisType {daTemperature=0, daAmps=1, daVolts=2, daSpeed=3, daAltitude=4};
 enum DataProfileType {dpCharge, dpDischarge};
 
 struct Dplot
@@ -48,19 +48,15 @@ public:
   ~MainWindow();
 
 private slots:
-  void titleDoubleClick(QMouseEvent *event, QCPPlotTitle *title);
-  void axisLabelDoubleClick(QCPAxis* axis, QCPAxis::SelectablePart part);
-  void legendDoubleClick(QCPLegend* legend, QCPAbstractLegendItem* item);
+
   void selectionChanged();
   void mousePress();
   void mouseWheel();
-  //void addRandomGraph();
-  void removeSelectedGraph();
+
   void removeAllGraphs();
   void resetZoom();
   void contextMenuRequest(QPoint pos);
-  void moveLegend();
-  void graphClicked(QCPAbstractPlottable *plottable);
+  //void graphClicked(QCPAbstractPlottable *plottable);
 
 
 
@@ -75,10 +71,14 @@ private slots:
 
   void loadSessionChooserPage();
 
+  void on_syncOkButton_clicked();
+
+  void on_syncNoButton_clicked();
+
 private:
   Ui::MainWindow *ui;
 
-
+  QVector<double> time;
   Dplot motorT;
   Dplot controllerT;
   Dplot volts;
@@ -87,13 +87,15 @@ private:
   Dplot altitude;
   //Dplot temperature;
   QVector<QString> datetime;
+  const QColor drivePlotColors[6] = {QColor(0,255,0), QColor(245,245,0), QColor(255,0,0),QColor(0,255,255) , QColor(255,0,127), QColor(255,85,0)};
+  QVector<QCPAxis *> driveAxis;
+
 
   QStringList localFiles;
   QStringList newFiles;
   int filesUploaded;
 
   QFtp ftp;
-  QProgressDialog progressdialog;
   QFile * localfile;
 
   void ftpListFiles();
@@ -102,8 +104,8 @@ private:
   void ftpGetFile();
   qint16 countDataFiles();
   void loadData(QString filepath, DataProfileType profile);
-  void addPlot(Dplot &plot);
-
+  void addPlot(Dplot &plot, QColor plotColor, DriveAxisType axisIndex);
+  void setupAxis();
 
   void ftpSetup();
   void chartSetup();

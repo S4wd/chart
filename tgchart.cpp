@@ -9,35 +9,18 @@ TgChart::TgChart(QWidget * parent) :
 
 
     connect(this, SIGNAL(mouseMove(QMouseEvent*)), this, SLOT(dataPointHint(QMouseEvent*)));
-    tracer = new QCPItemTracer(this);
-    //addItem(tracer);
-    tracer->setStyle(QCPItemTracer::tsCircle);
-    tracer->setVisible(true);
-    tracer->setPen(QPen(QColor(Qt::white)));
-    tracer->setInterpolating(false);
-    tracer->setGraphKey(1);
-
-
+    tracerGraph = NULL;
 }
 
 TgChart::~TgChart()
 {
     delete mRubberBand;
-}
-
-void TgChart::setZoomMode(bool mode)
-{
-    mZoomMode = mode;
+    delete tracerGraph;
 }
 
 void TgChart::setTracerGraph( QCPGraph * graph)
 {
-    tracer->setGraph(graph);
-}
-
-void TgChart::setTracerVisible(bool visible)
-{
-    tracer->setVisible(visible);
+    tracerGraph = graph;
 }
 
 void TgChart::mousePressEvent(QMouseEvent * event)
@@ -46,7 +29,7 @@ void TgChart::mousePressEvent(QMouseEvent * event)
     {
         if ( event->button() == Qt::MiddleButton)
         {
-            mOrigin = event->pos();
+            mOrigin = QPoint(event->pos().x(),axisRect()->topLeft().y());
             mRubberBand->setGeometry(QRect(mOrigin,
                                            QSize()));
             mRubberBand->show();
@@ -59,7 +42,7 @@ void TgChart::mouseMoveEvent(QMouseEvent * event)
 {
     if (mRubberBand->isVisible())
     {
-        mRubberBand->setGeometry(QRect(mOrigin, event->pos()).normalized());
+        mRubberBand->setGeometry(QRect(mOrigin, QPoint(event->pos().x(),axisRect()->bottomRight().y())).normalized());
     }
     QCustomPlot::mouseMoveEvent(event);
 }
@@ -68,16 +51,9 @@ void TgChart::mouseReleaseEvent(QMouseEvent * event)
 {
     if (mRubberBand->isVisible())
     {
-        const QRect & zoomRect = mRubberBand->geometry();
-        int xp1, yp1, xp2, yp2;
-        zoomRect.getCoords(&xp1, &yp1, &xp2, &yp2);
-        double x1 = xAxis->pixelToCoord(xp1);
-        double x2 = xAxis->pixelToCoord(xp2);
-        double y1 = yAxis->pixelToCoord(yp1);
-        double y2 = yAxis->pixelToCoord(yp2);
+        QRect zoomRect = mRubberBand->geometry();
 
-        xAxis->setRange(x1, x2);
-        yAxis->setRange(y1, y2);
+        xAxis->setRange(xAxis->pixelToCoord( zoomRect.topLeft().x()), xAxis->pixelToCoord( zoomRect.bottomRight().x()));
 
         mRubberBand->hide();
         replot();
@@ -88,10 +64,15 @@ void TgChart::mouseReleaseEvent(QMouseEvent * event)
 
 void TgChart::dataPointHint(QMouseEvent *event)
 {
-    int x = this->xAxis->pixelToCoord(event->pos().x());
-    int y = this->yAxis->pixelToCoord(event->pos().y());
+    if (tracerGraph == NULL)
+        return;
 
-    setToolTip(QString("%1 , %2").arg(x).arg(y));
+    int x = xAxis->pixelToCoord(event->pos().x());
+    QDateTime dt;
+    dt.setTime_t(x);
+    QString dateTime = dt.toString("ddd dd MM\nHH:mm:ss");
+    double y = tracerGraph->data()->value(x).value;
+    setToolTip(QString("%1 , %2").arg(dateTime).arg(y));
 }
 
 
